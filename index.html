@@ -106,7 +106,7 @@
         <li>你将看到 <b>15 份「明日头版」</b>——即某个重大宏观事件日的次日新闻头版（日期已隐去，与该四类资产相关的具体行情数字已按原版规则遮盖）。</li>
         <li>你相当于<b>提前一天知道了新闻</b>：在新闻发生前的最后一个收盘价建仓，新闻发酵后的第一个收盘价强制平仓。</li>
         <li>可交易四类资产：<b>上证综指、标普500、黄金（COMEX期货）、比特币</b>，可做多（买涨）也可做空（买跌）。</li>
-        <li>用滑杆设定每类资产的仓位倍数（杠杆），<b>四项总杠杆（绝对值之和）不得超过 50 倍。1 倍 = 仓位等于全部本金</b>。</li>
+        <li>用滑杆设定每类资产的仓位倍数（杠杆），<b>每项资产杠杆最高 3 倍，四项总杠杆（绝对值之和）不得超过 6 倍。1 倍 = 仓位等于全部本金</b>。</li>
         <li>起始资金 <b>￥1,000,000</b>（虚拟）。无交易成本与融资费用。资产净值归零即<b>爆仓出局</b>。</li>
         <li>没把握的回合可以「跳过」。所有事件均真实发生过，收益率来自真实历史行情（来源见页脚）。</li>
       </ul>
@@ -135,7 +135,7 @@
     <div class="card" id="tradePanel">
       <h2>设定仓位（正数=做多，负数=做空）</h2>
       <div id="sliders"></div>
-      <div class="grossbar">总杠杆：<b id="grossVal">0.0</b> / 50 <span id="grossWarn" class="over hidden">—— 超出上限，无法下单</span></div>
+      <div class="grossbar">总杠杆：<b id="grossVal">0.0</b> / 6 <span id="grossWarn" class="over hidden">—— 超出上限，无法下单</span></div>
       <div class="actions">
         <button class="btn" id="btnTrade" onclick="doTrade()">下单交易</button>
         <button class="btn ghost" onclick="doSkip()">跳过本轮</button>
@@ -340,7 +340,8 @@ const EVENTS = [
 ];
 
 const START_WEALTH = 1000000;
-const MAX_GROSS = 50;
+const MAX_PER_ASSET = 3;   // 每项资产滑杆上下限
+const MAX_GROSS = 6;       // 四项总杠杆（绝对值之和）上限
 
 /* ================= 状态 ================= */
 let order = [], cur = 0, wealth = START_WEALTH, history = [], playerName = "", busted = false;
@@ -384,7 +385,7 @@ function renderRound(){
   document.getElementById("sliders").innerHTML = ASSETS.map(a=>`
     <div class="asset">
       <div class="nm">${a.name}</div>
-      <input type="range" id="sl-${a.key}" min="-50" max="50" step="0.5" value="0" oninput="updateSliders()">
+      <input type="range" id="sl-${a.key}" min="${-MAX_PER_ASSET}" max="${MAX_PER_ASSET}" step="0.5" value="0" oninput="updateSliders()">
       <div class="posval" id="pv-${a.key}"><span class="flat">0.0×</span><br><span class="lev">空仓</span></div>
     </div>`).join("");
   updateSliders();
