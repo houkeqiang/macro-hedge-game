@@ -17,6 +17,9 @@
   h1{font-size:26px; letter-spacing:2px;}
   h2{font-size:19px; margin-bottom:10px;}
   .sub{color:var(--dim); font-size:13px; margin:6px 0 20px;}
+  .langswitch{text-align:right; font-size:13px; margin-bottom:2px;}
+  .langswitch a{color:var(--accent); text-decoration:none;}
+  .langswitch a:hover{text-decoration:underline;}
   .card{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:20px; margin-bottom:16px;}
   .btn{display:inline-block; background:var(--accent); color:#fff; border:none; border-radius:8px;
        padding:10px 26px; font-size:16px; cursor:pointer; font-family:inherit;}
@@ -99,6 +102,7 @@
 
   <!-- ========== Start screen ========== -->
   <div id="scr-start">
+    <div class="langswitch"><a href="index.html">中文版 · Chinese →</a></div>
     <h1>Macro Hedge Trading Challenge</h1>
     <div class="sub">A replication of Elm Wealth's “Crystal Ball Trading Challenge” (Haghani, White &amp; Bell, 2023) · the four-asset edition</div>
     <div class="card">
