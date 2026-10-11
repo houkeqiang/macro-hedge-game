@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>宏观对冲策略交易挑战｜提前看到明天的新闻，你能赚钱吗？</title>
-<meta name="description" content="复刻 Elm Wealth 水晶球实验：提前一天看到15个重大宏观事件的新闻头版，交易上证、标普500、黄金、比特币。原版实验中一半金融研究生亏钱、1/6爆仓——你能做得更好吗？">
+<title>Macro Hedge Trading Challenge — You see tomorrow's news. Can you make money?</title>
+<meta name="description" content="A replication of the Elm Wealth crystal-ball experiment: see tomorrow's front page for 15 major macro events and trade the SSE Composite, S&amp;P 500, gold and Bitcoin. In the original study half the finance graduate students lost money and one in six was wiped out — can you do better?">
 <style>
   :root{
     --bg:#12141a; --panel:#1c202b; --panel2:#232837; --line:#333a4d;
     --ink:#e8e6df; --dim:#9aa1b5; --paper:#f5f0e4; --paper-ink:#1e1a12;
-    --up:#e05c5c; --down:#3d9e6b; --gold:#d4a843; --accent:#5b8dd6;
+    --up:#3d9e6b; --down:#e05c5c; --gold:#d4a843; --accent:#5b8dd6;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
-  body{background:var(--bg); color:var(--ink); font-family:"Microsoft YaHei","PingFang SC",sans-serif; line-height:1.6;}
+  body{background:var(--bg); color:var(--ink); font-family:"Segoe UI","Helvetica Neue",Helvetica,Arial,sans-serif; line-height:1.6;}
   .wrap{max-width:860px; margin:0 auto; padding:24px 16px 60px;}
   h1{font-size:26px; letter-spacing:2px;}
   h2{font-size:19px; margin-bottom:10px;}
@@ -32,9 +32,9 @@
   .roundtag{color:var(--dim); font-size:14px;}
   /* newspaper */
   .paper{background:var(--paper); color:var(--paper-ink); border-radius:6px; padding:22px 26px;
-         font-family:"Noto Serif SC","SimSun",serif; box-shadow:0 4px 18px rgba(0,0,0,.45);}
+         font-family:Georgia,"Times New Roman",Times,serif; box-shadow:0 4px 18px rgba(0,0,0,.45);}
   .paper .masthead{text-align:center; border-bottom:3px double #1e1a12; padding-bottom:6px; margin-bottom:12px;}
-  .paper .masthead .name{font-size:20px; font-weight:900; letter-spacing:6px;}
+  .paper .masthead .name{font-size:20px; font-weight:900; letter-spacing:3px;}
   .paper .masthead .date{font-size:12px; color:#6b6350;}
   .paper h3{font-size:22px; line-height:1.4; font-weight:900; margin-bottom:10px;}
   .paper li{margin:6px 0 6px 22px; font-size:14.5px;}
@@ -58,6 +58,7 @@
   th,td{padding:7px 8px; text-align:right; border-bottom:1px solid var(--line); font-variant-numeric:tabular-nums;}
   th:first-child,td:first-child{text-align:left;}
   th{color:var(--dim); font-weight:normal; font-size:13px;}
+  #endTable td:nth-child(2),#endTable th:nth-child(5),#endTable td:nth-child(5){white-space:nowrap;}
   .pnlbig{font-size:20px; font-weight:bold; margin:10px 0;}
   .srcs{font-size:12px; color:var(--dim); margin-top:10px;}
   .srcs a{color:var(--accent); text-decoration:none;}
@@ -71,7 +72,7 @@
   .foot a{color:var(--accent); text-decoration:none;}
   .copybox{width:100%; height:220px; background:var(--panel2); color:var(--ink); border:1px solid var(--line);
            border-radius:8px; padding:10px; font-size:12.5px; font-family:Consolas,monospace; margin-top:10px;}
-  /* ---------- 手机 / 微信内置浏览器适配 ---------- */
+  /* ---------- mobile / in-app browser (WeChat, QQ) adjustments ---------- */
   @media (max-width:560px){
     .wrap{padding:14px 10px 40px;}
     h1{font-size:21px; letter-spacing:1px;}
@@ -79,7 +80,7 @@
     .paper{padding:14px 14px;}
     .paper h3{font-size:17.5px;}
     .paper li{font-size:13.5px; margin-left:18px;}
-    .paper .masthead .name{font-size:17px; letter-spacing:4px;}
+    .paper .masthead .name{font-size:17px; letter-spacing:2px;}
     .asset{grid-template-columns:1fr auto; grid-template-areas:"nm pv" "sl sl"; row-gap:2px;}
     .asset .nm{grid-area:nm;}
     .asset input[type=range]{grid-area:sl; height:28px;}
@@ -96,49 +97,49 @@
 <body>
 <div class="wrap">
 
-  <!-- ========== 开始页 ========== -->
+  <!-- ========== Start screen ========== -->
   <div id="scr-start">
-    <h1>宏观对冲策略交易挑战</h1>
-    <div class="sub">复刻自 Elm Wealth《Crystal Ball Trading Challenge》（Haghani, White &amp; Bell, 2023）· 四类资产的中国版</div>
+    <h1>Macro Hedge Trading Challenge</h1>
+    <div class="sub">A replication of Elm Wealth's “Crystal Ball Trading Challenge” (Haghani, White &amp; Bell, 2023) · the four-asset edition</div>
     <div class="card">
-      <h2>游戏规则</h2>
+      <h2>How it works</h2>
       <ul class="rules">
-        <li>你将看到 <b>15 份「明日头版」</b>——即某个重大宏观事件日的次日新闻头版（日期已隐去，与该四类资产相关的具体行情数字已按原版规则遮盖）。</li>
-        <li>你相当于<b>提前一天知道了新闻</b>：在新闻发生前的最后一个收盘价建仓，新闻发酵后的第一个收盘价强制平仓。</li>
-        <li>可交易四类资产：<b>上证综指、标普500、黄金（COMEX期货）、比特币</b>，可做多（买涨）也可做空（买跌）。</li>
-        <li>用滑杆设定每类资产的仓位倍数（杠杆），<b>每项资产杠杆最高 3 倍，四项总杠杆（绝对值之和）不得超过 6 倍。1 倍 = 仓位等于全部本金</b>。</li>
-        <li>起始资金 <b>￥1,000,000</b>（虚拟）。无交易成本与融资费用。资产净值归零即<b>爆仓出局</b>。</li>
-        <li>没把握的回合可以「跳过」。所有事件均真实发生过，收益率来自真实历史行情（来源见页脚）。</li>
+        <li>You will see <b>15 “tomorrow's front pages”</b> — the newspaper front page from the day after a major macro event (the date is hidden, and the price moves for the four assets have been blacked out, as in the original experiment).</li>
+        <li>You are <b>seeing the news a day early</b>: you enter at the last close before the news breaks, and are force-closed at the first close after the news has been absorbed.</li>
+        <li>Four tradable assets: <b>SSE Composite, S&amp;P 500, gold (COMEX futures), Bitcoin</b>. Go long (bet on a rise) or short (bet on a fall).</li>
+        <li>Use the sliders to set the position multiple (leverage) for each asset — <b>up to 3× per asset, and no more than 6× in total (the sum of the absolute values). 1× = a position equal to your entire capital</b>.</li>
+        <li>Starting capital <b>$1,000,000</b> (virtual). No trading costs or financing fees. If your equity hits zero you are <b>wiped out</b>.</li>
+        <li>You can <b>skip</b> any round you are unsure about. Every event really happened, and every return comes from real historical prices (sources in the footer).</li>
       </ul>
       <div style="margin-top:16px">
-        <label>姓名 / 昵称（选填，用于成绩）：<br><input type="text" id="playerName" placeholder="选填"></label>
+        <label>Name / nickname (optional, shown on your scorecard):<br><input type="text" id="playerName" placeholder="optional"></label>
       </div>
       <div class="actions">
-        <button class="btn" onclick="startGame()">开始挑战</button>
+        <button class="btn" onclick="startGame()">Start Challenge</button>
       </div>
     </div>
     <div class="card" style="font-size:13.5px;color:var(--dim)">
-      原版实验中，118 名金融专业研究生在拥有同样"水晶球"的情况下：约一半人亏损、六分之一爆仓，平均收益仅 +3.2%；
-      而 5 位资深宏观交易员平均获利 +130%。你能做得更好吗？
+      In the original experiment, 118 finance graduate students were handed the same crystal ball: about half of them lost money, one in six was wiped out, and the average return was just +3.2%.
+      Five veteran macro traders averaged +130%. Can you do better?
     </div>
   </div>
 
-  <!-- ========== 游戏页 ========== -->
+  <!-- ========== Game screen ========== -->
   <div id="scr-game" class="hidden">
     <div class="topbar">
       <div class="roundtag" id="roundTag"></div>
-      <div>当前资产净值：<span class="wealth" id="wealthTag"></span></div>
+      <div>Current equity: <span class="wealth" id="wealthTag"></span></div>
     </div>
 
     <div class="paper" id="newsCard"></div>
 
     <div class="card" id="tradePanel">
-      <h2>设定仓位（正数=做多，负数=做空）</h2>
+      <h2>Set your positions (positive = long, negative = short)</h2>
       <div id="sliders"></div>
-      <div class="grossbar">总杠杆：<b id="grossVal">0.0</b> / 6 <span id="grossWarn" class="over hidden">—— 超出上限，无法下单</span></div>
+      <div class="grossbar">Total leverage: <b id="grossVal">0.0</b> / 6 <span id="grossWarn" class="over hidden">— over the cap, you cannot place this trade</span></div>
       <div class="actions">
-        <button class="btn" id="btnTrade" onclick="doTrade()">下单交易</button>
-        <button class="btn ghost" onclick="doSkip()">跳过本轮</button>
+        <button class="btn" id="btnTrade" onclick="doTrade()">Place Trade</button>
+        <button class="btn ghost" onclick="doSkip()">Skip Round</button>
       </div>
     </div>
 
@@ -146,204 +147,204 @@
       <h2 id="revealTitle"></h2>
       <div id="revealBody"></div>
       <div class="actions">
-        <button class="btn" id="btnNext" onclick="nextRound()">下一轮 →</button>
+        <button class="btn" id="btnNext" onclick="nextRound()">Next Round →</button>
       </div>
     </div>
   </div>
 
-  <!-- ========== 结算页 ========== -->
+  <!-- ========== Final screen ========== -->
   <div id="scr-end" class="hidden">
-    <h1>挑战结束</h1>
+    <h1>Challenge Complete</h1>
     <div class="card" id="endSummary"></div>
     <div class="card">
-      <h2>逐轮明细</h2>
+      <h2>Round by round</h2>
       <div style="overflow-x:auto"><table id="endTable"></table></div>
     </div>
     <div class="actions">
-      <button class="btn" id="btnExport" onclick="exportResults()">导出成绩</button>
-      <button class="btn ghost" onclick="location.reload()">再来一局</button>
+      <button class="btn" id="btnExport" onclick="exportResults()">Export Results</button>
+      <button class="btn ghost" onclick="location.reload()">Play Again</button>
     </div>
     <div class="card hidden" id="copyPanel">
-      <h2>成绩单（长按全选复制，或直接截图发朋友圈）</h2>
+      <h2>Scorecard (select all and copy, or just take a screenshot)</h2>
       <textarea class="copybox" id="copyText" readonly onclick="this.select()"></textarea>
     </div>
   </div>
 
   <div class="foot">
-    注：原版为标普500+30年期美债，本版改为上证/标普/黄金/比特币四类资产。
-    行情数据：Yahoo Finance 日线收盘价（000001.SS，^GSPC，GC=F，BTC-USD），收益窗口为"新闻时点前最后收盘 → 新闻发酵后首个收盘"，按各资产自身交易日历对齐；
-    详见同目录《研究报告》。仅用于MF课程《个人财富管理》教学，不构成任何投资建议。
+    Note: the original experiment traded the S&amp;P 500 and 30-year US Treasuries; this version trades four assets — SSE Composite, S&amp;P 500, gold and Bitcoin.
+    Prices: Yahoo Finance daily closes (000001.SS, ^GSPC, GC=F, BTC-USD). Each return window runs from the last close before the news moment to the first close after the news had been absorbed, aligned to each asset's own trading calendar;
+    see the research report for the full methodology. For teaching use in the MF course Personal Wealth Management only. Nothing here is investment advice.
   </div>
 </div>
 
 <script>
 "use strict";
-/* ================= 数据（真实历史收益率，6位小数） =================
-   ret 顺序: sse(上证), spx(标普500), gold(黄金GC=F), btc(比特币)      */
+/* ================= Data (real historical returns, 6 decimals) =================
+   ret order: sse (SSE Composite), spx (S&P 500), gold (GC=F), btc (Bitcoin)      */
 const ASSETS = [
-  {key:"sse",  name:"上证综指"},
-  {key:"spx",  name:"标普500"},
-  {key:"gold", name:"黄金"},
-  {key:"btc",  name:"比特币"},
+  {key:"sse",  name:"SSE Composite"},
+  {key:"spx",  name:"S&P 500"},
+  {key:"gold", name:"Gold"},
+  {key:"btc",  name:"Bitcoin"},
 ];
 
 const EVENTS = [
- {id:"E01", date:"2015-08-11", tag:"央行“8·11”汇改",
-  head:"中国央行意外调整人民币中间价报价机制，人民币单日贬值近2%——1994年汇率并轨以来最大跌幅",
+ {id:"E01", date:"2015-08-11", tag:"PBOC fixing reform",
+  head:"China's central bank unexpectedly changes how the yuan's daily fixing is set; the currency falls nearly 2% in a day — its biggest drop since exchange rates were unified in 1994",
   bullets:[
-   "央行称此举为完善中间价报价机制的“一次性校正”，今后中间价将参考上日收盘价",
-   "此前公布的7月出口同比下降8.3%，远逊于预期；PPI创2009年以来最大跌幅",
-   "分析人士警告贬值或加剧资本外流压力，并引发新兴市场竞争性贬值担忧"],
+   "The PBOC calls the move a one-off correction to improve the fixing mechanism, and says the fixing will now reference the previous day's close",
+   "July exports, reported days earlier, fell 8.3% year on year — far worse than expected; producer prices posted their biggest drop since 2009",
+   "Analysts warn the devaluation could intensify capital-outflow pressure and raise fears of competitive devaluation across emerging markets"],
   ret:{sse:-0.000129, spx:-0.009557, gold:0.003079, btc:0.022369},
   srcs:[["CNBC","https://www.cnbc.com/2015/08/11/us-markets-yuan.html"],
         ["LA Times","https://www.latimes.com/business/la-fi-wall-street-20150811-story.html"]]},
 
- {id:"E02", date:"2016-06-24", tag:"英国脱欧公投",
-  head:"英国公投决定脱离欧盟：52%对48%，卡梅伦宣布辞职",
+ {id:"E02", date:"2016-06-24", tag:"Brexit referendum",
+  head:"Britain votes to leave the European Union, 52% to 48%; Cameron announces his resignation",
   bullets:[
-   "结果出乎市场普遍预期——公投前民调与博彩赔率均倾向“留欧”",
-   "这是欧盟成立以来遭受的最大挫折，市场担忧其他成员国效仿举行公投",
-   "英镑兑美元跌至31年低点；全球投资者涌向避险资产"],
+   "The result defied broad expectations — pre-vote polls and betting odds both pointed to Remain",
+   "The biggest setback for the EU since its founding; markets fear other member states will follow with referendums of their own",
+   "Sterling falls to a 31-year low against the dollar as investors around the world pile into safe-haven assets"],
   ret:{sse:-0.013027, spx:-0.03592, gold:0.046622, btc:0.066224},
   srcs:[["Reuters","https://finance.yahoo.com/news/sterling-skids-bonds-rally-brexit-002331008.html"],
         ["BBC","https://www.bbc.com/news/business-36626085"]]},
 
- {id:"E03", date:"2016-11-09", tag:"特朗普当选",
-  head:"特朗普击败希拉里当选美国第45任总统，共和党同时控制参众两院",
+ {id:"E03", date:"2016-11-09", tag:"Trump elected",
+  head:"Trump beats Clinton to become the 45th US president, with Republicans holding both the House and the Senate",
   bullets:[
-   "结果与主流民调和市场预期相悖，被媒体称为“史上最大爆冷”之一",
-   "特朗普胜选演讲承诺大规模基建投资、减税与放松监管",
-   "竞选期间他曾主张对华征收45%关税、重谈贸易协定"],
+   "The outcome contradicted the mainstream polls and market expectations, and was called one of the biggest upsets in history",
+   "In his victory speech Trump promised large-scale infrastructure investment, tax cuts and deregulation",
+   "On the campaign trail he had argued for a 45% tariff on Chinese goods and for renegotiating trade agreements"],
   ret:{sse:-0.0062, spx:0.011077, gold:-0.000628, btc:0.018912},
   srcs:[["BBC","https://www.bbc.com/news/business-37921036"],
         ["TIME","https://time.com/4565252/donald-trump-election-stock-market-rise/"]]},
 
- {id:"E04", date:"2017-09-04", tag:"七部委叫停ICO",
-  head:"央行等七部委联合公告：代币发行融资（ICO）属未经批准的非法公开融资，各类ICO活动应立即停止",
+ {id:"E04", date:"2017-09-04", tag:"China halts ICOs",
+  head:"The central bank and six other ministries jointly declare that initial coin offerings are unauthorised, illegal public fundraising, and that all ICO activity must stop immediately",
   bullets:[
-   "公告要求已完成发行的组织和个人清退资金，保护投资者权益",
-   "监管层调查显示逾九成ICO项目涉嫌非法集资或欺诈",
-   "多家平台已暂停ICO业务；市场担忧针对虚拟货币交易所的整顿将进一步升级"],
+   "The notice orders organisations and individuals that have already completed an offering to return the funds, to protect investors",
+   "Regulatory investigations suggest more than 90% of ICO projects involve illegal fundraising or fraud",
+   "Several platforms have already suspended ICO business, and the market fears a wider crackdown on cryptocurrency exchanges"],
   ret:{sse:0.001326, spx:-0.007551, gold:0.011099, btc:-0.075639},
   srcs:[["Caixin Global","https://www.caixinglobal.com/2017-09-04/china-claws-back-at-cryptocurrencies-with-ban-on-initial-coin-offerings-101140498.html"],
         ["CNBC","https://www.cnbc.com/2017/09/04/chinese-icos-china-bans-fundraising-through-initial-coin-offerings-report-says.html"]]},
 
- {id:"E05", date:"2018-03-23", tag:"中美贸易战开打",
-  head:"特朗普签署备忘录：依据301调查对最高600亿美元中国商品加征关税，并限制中国对美投资",
+ {id:"E05", date:"2018-03-23", tag:"US-China trade war begins",
+  head:"Trump signs a memorandum imposing tariffs on up to $60 billion of Chinese goods under the Section 301 investigation, and restricting Chinese investment in the United States",
   bullets:[
-   "此前美国已宣布对进口钢铁和铝分别征收25%和10%关税",
-   "中方宣布拟对约30亿美元美国产品（猪肉、水果、钢管等）加征关税作为回应",
-   "外交部表态：“我们不想跟任何人打贸易战，但如果有人逼我们打，我们既不会怕也不会躲”"],
+   "The US had already announced tariffs of 25% on imported steel and 10% on aluminium",
+   "China says it plans to hit about $3 billion of US products — pork, fruit and steel pipes among them — with retaliatory tariffs",
+   "The foreign ministry: “We do not want a trade war with anyone, but if someone forces one on us, we will neither be afraid nor hide from it”"],
   ret:{sse:-0.033927, spx:-0.025163, gold:0.004467, btc:-0.022489},
   srcs:[["AP","https://apnews.com/article/8af984cb1aec474594a9d90d511c49cf"],
         ["China Daily","https://www.chinadaily.com.cn/a/201803/23/WS5ab4c12da3105cdcf6513e89.html"]]},
 
- {id:"E06", date:"2019-08-05", tag:"人民币破7",
-  head:"人民币兑美元11年来首次“破7”，美国财政部宣布将中国列为汇率操纵国——1994年以来首次",
+ {id:"E06", date:"2019-08-05", tag:"Yuan breaks 7",
+  head:"The yuan breaks 7 to the dollar for the first time in 11 years, and the US Treasury labels China a currency manipulator — the first such designation since 1994",
   bullets:[
-   "数日前特朗普突然宣布拟于9月1日起对剩余3000亿美元中国商品加征10%关税，打破贸易战停火",
-   "中方宣布相关企业暂停采购美国农产品",
-   "美国财政部称将联合IMF“消除中国最新行动带来的不公平竞争优势”"],
+   "Days earlier Trump abruptly announced a 10% tariff on the remaining $300 billion of Chinese goods from 1 September, breaking the trade-war truce",
+   "China says its companies will suspend purchases of US agricultural products",
+   "The Treasury says it will work with the IMF to “eliminate the unfair competitive advantage created by China's latest actions”"],
   ret:{sse:-0.016159, spx:-0.029778, gold:0.013143, btc:0.076158},
   srcs:[["Reuters","https://www.reuters.com/article/business/us-designates-china-as-currency-manipulator-for-first-time-in-decades-idUSKCN1UV2BJ/"],
         ["AP","https://apnews.com/article/3548adeadd804a2db540ff17acad3e1c"]]},
 
- {id:"E07", date:"2020-03-16", tag:"美联储紧急降息至零",
-  head:"美联储周日晚紧急降息100基点至0–0.25%，并推出7000亿美元量化宽松；特朗普：经济“可能”正走向衰退",
+ {id:"E07", date:"2020-03-16", tag:"Fed cuts to zero",
+  head:"The Fed cuts rates by 100bp to 0–0.25% in an emergency Sunday-night move and launches $700 billion of quantitative easing; Trump says the economy “may” be heading into recession",
   bullets:[
-   "这是两周内第二次紧急降息，并与欧英日加瑞央行联合行动",
-   "新冠疫情全球蔓延，多国宣布封锁；白宫呼吁民众未来15天避免10人以上聚集",
-   "市场担忧：央行“弹药”是否已经打光？"],
+   "It is the second emergency cut in a fortnight, coordinated with the ECB and the central banks of the UK, Japan, Canada and Switzerland",
+   "COVID-19 spreads around the world and countries announce lockdowns; the White House urges people to avoid gatherings of more than 10 for the next 15 days",
+   "The market's question: has the central bank run out of ammunition?"],
   ret:{sse:-0.034, spx:-0.119841, gold:-0.019661, btc:-0.070069},
   srcs:[["Reuters","https://www.reuters.com/article/business/another-black-monday-as-coronavirus-response-upends-wall-street-idUSKBN2131B0/"],
         ["BBC","https://www.bbc.com/news/business-51903195"]]},
 
- {id:"E08", date:"2020-11-09", tag:"辉瑞疫苗突破",
-  head:"辉瑞/BioNTech宣布新冠疫苗Ⅲ期中期结果：有效率超过90%，远超监管批准门槛",
+ {id:"E08", date:"2020-11-09", tag:"Pfizer vaccine breakthrough",
+  head:"Pfizer and BioNTech report interim Phase III results for their COVID-19 vaccine: efficacy above 90%, far clear of the bar for regulatory approval",
   bullets:[
-   "科学界称之为扭转疫情的“分水岭时刻”；大规模接种预计明年初启动",
-   "数日前拜登刚被宣布赢得美国大选，市场不确定性下降",
-   "投资者开始重新评估“居家经济”与“重启经济”两类资产的前景"],
+   "Scientists call it the watershed moment that turned the pandemic around; mass vaccination is expected to begin early next year",
+   "Days earlier Joe Biden was declared the winner of the US election, easing market uncertainty",
+   "Investors start reassessing the outlook for “stay-at-home” assets versus “reopening” assets"],
   ret:{sse:-0.004026, spx:0.0117, gold:-0.049787, btc:-0.009513},
   srcs:[["Reuters","https://www.reuters.com/article/business/pfizer-vaccine-trial-success-signals-breakthrough-in-pandemic-battle-idUSKBN27P1CS/"],
         ["BBC","https://www.bbc.co.uk/news/business-54874108"]]},
 
- {id:"E09", date:"2021-05-19", tag:"虚拟货币业务禁令",
-  head:"中国互联网金融协会、银行业协会、支付清算协会联合公告：金融机构和支付机构不得开展虚拟货币相关业务",
+ {id:"E09", date:"2021-05-19", tag:"China bans crypto business",
+  head:"China's internet finance, banking and payment-clearing associations jointly announce that financial institutions and payment companies must not carry out any cryptocurrency-related business",
   bullets:[
-   "公告重申虚拟货币“不应且不能作为货币在市场上流通使用”",
-   "警告机构不得提供虚拟货币交易、兑换、清算结算等任何服务",
-   "币圈高杠杆多头仓位面临连环强平风险"],
+   "The notice repeats that virtual currency “should not and cannot be used as currency in the market”",
+   "It warns institutions against providing any crypto trading, exchange, clearing or settlement services",
+   "Highly leveraged long positions in crypto face a chain reaction of forced liquidations"],
   ret:{sse:-0.005115, spx:-0.002943, gold:0.007228, btc:-0.137661},
   srcs:[["Reuters","https://www.reuters.com/technology/bitcoin-ethereum-plunge-crypto-market-cap-losses-nearly-1-trillion-2021-05-19/"],
         ["BBC","https://www.bbc.com/news/business-57169726"]]},
 
- {id:"E10", date:"2022-02-24", tag:"俄乌战争爆发",
-  head:"俄罗斯对乌克兰发动全面军事行动，基辅等多地遭导弹袭击",
+ {id:"E10", date:"2022-02-24", tag:"Russia invades Ukraine",
+  head:"Russia launches a full-scale military assault on Ukraine, with missile strikes on Kyiv and other cities",
   bullets:[
-   "普京凌晨宣布“特别军事行动”，两天前俄刚承认乌东两个“共和国”独立",
-   "美欧宣布将实施“严厉代价”级别制裁；北约向东翼增兵",
-   "布伦特原油2014年以来首次突破每桶100美元；小麦期货创十年新高"],
+   "Putin announces a “special military operation” in the early hours; two days earlier Russia recognised two breakaway “republics” in eastern Ukraine",
+   "The US and Europe promise sanctions that will impose a severe cost; NATO sends reinforcements to its eastern flank",
+   "Brent crude tops $100 a barrel for the first time since 2014 and wheat futures hit a ten-year high"],
   ret:{sse:-0.016964, spx:0.014957, gold:0.008328, btc:0.027778},
   srcs:[["CNBC","https://www.cnbc.com/2022/02/24/global-markets-roiled-as-russia-invades-ukraine.html"],
         ["Washington Post","https://www.washingtonpost.com/world/2022/02/24/ukraine-europe-markets-russia/"]]},
 
- {id:"E11", date:"2022-09-13", tag:"美国CPI超预期",
-  head:"美国8月CPI同比上涨8.3%，高于预期的8.1%；核心CPI环比加速至0.6%",
+ {id:"E11", date:"2022-09-13", tag:"US inflation surprise",
+  head:"US August CPI rises 8.3% year on year, above the 8.1% expected; core CPI accelerates to 0.6% month on month",
   bullets:[
-   "数据公布前，市场普遍相信通胀已经见顶、连涨一周",
-   "交易员大幅上调美联储激进加息押注，甚至开始定价单次加息100基点的可能",
-   "经济学家：广泛的价格压力表明通胀比预期更具粘性"],
+   "Before the release the market largely believed inflation had peaked, and stocks had rallied for a week",
+   "Traders sharply raise their bets on aggressive Fed hikes, even starting to price in a 100bp move at a single meeting",
+   "Economists say the breadth of the price pressure shows inflation is stickier than expected"],
   ret:{sse:-0.008046, spx:-0.043237, gold:-0.013367, btc:-0.0927},
   srcs:[["Reuters","https://www.reuters.com/markets/europe/wall-st-outlook-darkens-grim-inflation-report-tees-up-more-fed-hawkishness-2022-09-13/"],
         ["NYT","https://www.nytimes.com/2022/09/13/business/markets-inflation-stocks.html"]]},
 
- {id:"E12", date:"2023-03-13", tag:"硅谷银行倒闭与兜底",
-  head:"硅谷银行48小时内倒闭——2008年以来最大银行破产；财政部、美联储、FDIC周日晚联合声明：所有存款人周一起可全额取用存款",
+ {id:"E12", date:"2023-03-13", tag:"Silicon Valley Bank fails",
+  head:"Silicon Valley Bank collapses within 48 hours — the largest bank failure since 2008; in a joint Sunday-night statement the Treasury, the Fed and the FDIC say every depositor will have full access to their money from Monday",
   bullets:[
-   "签名银行（Signature Bank）同日被监管关闭，为美国史上第三大银行倒闭",
-   "美联储推出新的紧急流动性工具（BTFP）向银行体系提供资金",
-   "声明强调纳税人不承担损失，但股东和部分债权人不获保护；市场担忧危机向中小银行蔓延"],
+   "Signature Bank is closed by regulators the same day, the third-largest bank failure in US history",
+   "The Fed launches a new emergency liquidity facility (the BTFP) to fund the banking system",
+   "The statement stresses that taxpayers will bear no losses, but shareholders and some creditors are not protected; markets fear the crisis spreading to smaller banks"],
   ret:{sse:0.011956, spx:-0.00151, gold:0.026692, btc:0.091752},
   srcs:[["Reuters","https://www.reuters.com/business/finance/us-fdic-corp-transfers-svb-deposits-new-bridge-bank-2023-03-13/"],
         ["CNBC","https://www.cnbc.com/2023/03/13/bitcoin-btc-crypto-prices-surge-as-svb-depositors-protected.html"]]},
 
- {id:"E13", date:"2024-08-05", tag:"日元套息平仓股灾",
-  head:"日经指数单日暴跌12%——1987年“黑色星期一”以来最大跌幅；日元套息交易平仓引发全球连锁抛售",
+ {id:"E13", date:"2024-08-05", tag:"Yen carry trade unwind",
+  head:"Japan's Nikkei plunges 12% in a single day — its worst fall since Black Monday in 1987 — as the unwinding of yen carry trades triggers a global sell-off",
   bullets:[
-   "上周五公布的美国非农就业远逊预期，引发衰退担忧；日本央行上周意外加息推升日元",
-   "分析师：多年零利率催生的巨量日元套息头寸正被迫平仓、追缴保证金",
-   "VIX恐慌指数盘中飙升至疫情以来最高水平"],
+   "Friday's US jobs report came in far below expectations, stoking recession fears, and the Bank of Japan's surprise rate rise last week has pushed the yen higher",
+   "Analysts: the enormous yen-funded carry positions built up over years of zero rates are being forcibly unwound, with margin calls piling up",
+   "The VIX fear index spikes intraday to its highest level since the pandemic"],
   ret:{sse:-0.015365, spx:-0.029969, gold:-0.009894, btc:-0.070986},
   srcs:[["Reuters","https://www.reuters.com/markets/asia/japans-nikkei-sees-biggest-rout-since-1987-black-monday-2024-08-05/"],
         ["BIS Bulletin 90","https://www.bis.org/publ/bisbull90.pdf"]]},
 
- {id:"E14", date:"2024-09-24", tag:"“9·24”一揽子刺激",
-  head:"央行、金融监管总局、证监会罕见联合发布会：降准50基点、下调政策利率、降存量房贷利率，并创设两项支持股市的新工具",
+ {id:"E14", date:"2024-09-24", tag:"China stimulus package",
+  head:"In a rare joint briefing, the central bank, the financial regulator and the securities regulator cut the reserve requirement ratio by 50bp, lower policy rates and existing mortgage rates, and create two new tools to support the stock market",
   bullets:[
-   "降准释放约1万亿元长期流动性；7天逆回购利率由1.7%降至1.5%",
-   "首创5000亿元互换便利支持机构增持股票、3000亿元再贷款支持上市公司回购",
-   "存量房贷利率平均下调约0.5个百分点，全国统一下调购房首付比例至15%"],
+   "The RRR cut releases about 1 trillion yuan of long-term liquidity; the 7-day reverse repo rate falls from 1.7% to 1.5%",
+   "A first-of-its-kind 500 billion yuan swap facility to help institutions buy more stocks, plus 300 billion yuan of relending to support buybacks by listed companies",
+   "Existing mortgage rates come down by about 0.5 percentage point on average, and the minimum down payment on a home is cut nationwide to 15%"],
   ret:{sse:0.041547, spx:0.002511, gold:0.009404, btc:0.015351},
   srcs:[["Reuters","https://www.reuters.com/world/china/china-rolls-out-broad-rate-cuts-other-stimulus-spur-weak-economy-2024-09-24/"],
         ["Xinhua","https://english.news.cn/20240924/7688723503874eb59f5fe4d5690940a3/c.html"]]},
 
- {id:"E15", date:"2025-04-03", tag:"“解放日”对等关税",
-  head:"特朗普宣布“解放日”对等关税：对所有进口商品征收最低10%关税，对中国、欧盟等征收更高税率",
+ {id:"E15", date:"2025-04-03", tag:"“Liberation Day” tariffs",
+  head:"Trump announces “Liberation Day” reciprocal tariffs: a floor of 10% on every imported good, with higher rates for China, the EU and others",
   bullets:[
-   "整体关税水平将升至约一个世纪以来最高",
-   "机构测算：关税或拖累美国GDP增速约2个百分点，并将通胀推向5%",
-   "被分析师称为“比最坏预期更坏的方案”；各国酝酿反制措施"],
+   "The overall tariff level would rise to the highest in about a century",
+   "Analysts estimate the tariffs could knock roughly 2 percentage points off US GDP growth and push inflation towards 5%",
+   "Described by analysts as “worse than the worst case”; governments begin drawing up countermeasures"],
   ret:{sse:-0.002423, spx:-0.048396, gold:-0.013663, btc:0.007482},
   srcs:[["AP","https://apnews.com/article/stocks-markets-rates-tariffs-52dbb020a4c41122e31669c2da236d67"],
         ["NPR","https://www.npr.org/2025/04/03/nx-s1-5350938/markets-plunge-after-liberation-day-tariffs"]]},
 ];
 
 const START_WEALTH = 1000000;
-const MAX_PER_ASSET = 3;   // 每项资产滑杆上下限
-const MAX_GROSS = 6;       // 四项总杠杆（绝对值之和）上限
+const MAX_PER_ASSET = 3;   // slider bound for each asset, both directions
+const MAX_GROSS = 6;       // cap on total leverage (sum of absolute values)
 
-/* ================= 状态 ================= */
+/* ================= State ================= */
 let order = [], cur = 0, wealth = START_WEALTH, history = [], playerName = "", busted = false;
 
 function shuffle(a){
@@ -353,11 +354,11 @@ function shuffle(a){
   }
   return a;
 }
-const fmtM = n => "￥" + n.toLocaleString("zh-CN",{maximumFractionDigits:0});
+const fmtM = n => (n<0?"-$":"$") + Math.abs(n).toLocaleString("en-US",{maximumFractionDigits:0});
 const fmtP = r => (r>=0?"+":"") + (r*100).toFixed(2) + "%";
 const cls  = r => r>0.0001 ? "long" : (r<-0.0001 ? "short" : "flat");
 
-/* ================= 流程 ================= */
+/* ================= Flow ================= */
 function startGame(){
   playerName = document.getElementById("playerName").value.trim();
   order = shuffle(EVENTS.slice());
@@ -369,24 +370,24 @@ function startGame(){
 
 function renderRound(){
   const ev = order[cur];
-  document.getElementById("roundTag").textContent = `第 ${cur+1} / ${order.length} 轮`;
+  document.getElementById("roundTag").textContent = `Round ${cur+1} / ${order.length}`;
   document.getElementById("wealthTag").textContent = fmtM(wealth);
 
   const bullets = ev.bullets.map(b=>`<li>${b}</li>`).join("");
   document.getElementById("newsCard").innerHTML = `
     <div class="masthead">
-      <div class="name">明日头版</div>
-      <div class="date">日期：██████（已隐去）</div>
+      <div class="name">Tomorrow's Front Page</div>
+      <div class="date">Date: ██████ (hidden)</div>
     </div>
     <h3>${ev.head}</h3>
     <ul>${bullets}</ul>
-    <div class="redactnote">注：与上证综指、标普500、黄金、比特币相关的当日行情数字已按原版规则遮盖 <span class="redact">████████</span></div>`;
+    <div class="redactnote">Note: the day's price moves for the SSE Composite, S&amp;P 500, gold and Bitcoin have been blacked out, as in the original experiment <span class="redact">████████</span></div>`;
 
   document.getElementById("sliders").innerHTML = ASSETS.map(a=>`
     <div class="asset">
       <div class="nm">${a.name}</div>
       <input type="range" id="sl-${a.key}" min="${-MAX_PER_ASSET}" max="${MAX_PER_ASSET}" step="0.5" value="0" oninput="updateSliders()">
-      <div class="posval" id="pv-${a.key}"><span class="flat">0.0×</span><br><span class="lev">空仓</span></div>
+      <div class="posval" id="pv-${a.key}"><span class="flat">0.0×</span><br><span class="lev">flat</span></div>
     </div>`).join("");
   updateSliders();
 
@@ -407,7 +408,7 @@ function updateSliders(){
   ASSETS.forEach(a=>{
     const w = pos[a.key]; gross += Math.abs(w);
     const el = document.getElementById("pv-"+a.key);
-    const dir = w>0 ? "做多" : (w<0 ? "做空" : "空仓");
+    const dir = w>0 ? "long" : (w<0 ? "short" : "flat");
     const c = w>0 ? "long" : (w<0 ? "short" : "flat");
     el.innerHTML = `<span class="${c}">${w>0?"+":""}${w.toFixed(1)}×</span><br><span class="lev">${dir}</span>`;
   });
@@ -436,7 +437,7 @@ function renderReveal(ev, pos, skipped, before){
   const panel = document.getElementById("revealPanel");
   panel.classList.remove("hidden");
   document.getElementById("revealTitle").textContent =
-    `揭晓：${ev.date} —— ${ev.tag}`;
+    `Revealed: ${ev.date} — ${ev.tag}`;
 
   const rows = ASSETS.map(a=>{
     const r = ev.ret[a.key], w = pos[a.key], contrib = w*r;
@@ -449,19 +450,19 @@ function renderReveal(ev, pos, skipped, before){
   const pnl = wealth - before;
   const srcs = ev.srcs.map(s=>`<a href="${s[1]}" target="_blank">${s[0]}</a>`).join(" · ");
   let verdict;
-  if(skipped) verdict = `<div class="pnlbig flat">本轮跳过，资金不变。</div>`;
-  else if(busted) verdict = `<div class="pnlbig bust">爆仓！资产净值归零，挑战结束。</div>`;
-  else verdict = `<div class="pnlbig ${cls(pnl)}">本轮损益：${(pnl>=0?"+":"")+fmtM(pnl).replace("￥","￥")}　（净值 ${fmtM(before)} → ${fmtM(wealth)}）</div>`;
+  if(skipped) verdict = `<div class="pnlbig flat">Round skipped — capital unchanged.</div>`;
+  else if(busted) verdict = `<div class="pnlbig bust">Wiped out! Equity has hit zero and the challenge is over.</div>`;
+  else verdict = `<div class="pnlbig ${cls(pnl)}">P&amp;L this round: ${(pnl>=0?"+":"")+fmtM(pnl)} (equity ${fmtM(before)} → ${fmtM(wealth)})</div>`;
 
   document.getElementById("revealBody").innerHTML = `
     <div style="overflow-x:auto"><table>
-      <tr><th>资产</th><th>真实涨跌</th><th>你的仓位</th><th>贡献损益</th></tr>
+      <tr><th>Asset</th><th>Actual move</th><th>Your position</th><th>P&amp;L contributed</th></tr>
       ${rows}
     </table></div>
     ${verdict}
-    <div class="srcs">新闻来源：${srcs}　|　行情：Yahoo Finance 日线收盘</div>`;
+    <div class="srcs">Sources: ${srcs} | Prices: Yahoo Finance daily closes</div>`;
   document.getElementById("btnNext").textContent =
-    (busted || cur === order.length-1) ? "查看总结算 →" : "下一轮 →";
+    (busted || cur === order.length-1) ? "See Final Results →" : "Next Round →";
   document.getElementById("wealthTag").textContent = fmtM(wealth);
 }
 
@@ -471,7 +472,7 @@ function nextRound(){
   renderRound();
 }
 
-/* ================= 结算 ================= */
+/* ================= Settlement ================= */
 function renderEnd(){
   document.getElementById("scr-game").classList.add("hidden");
   document.getElementById("scr-end").classList.remove("hidden");
@@ -492,30 +493,30 @@ function renderEnd(){
   const avgGross = traded.length? (grossSum/traded.length).toFixed(1)+"×" : "—";
 
   document.getElementById("endSummary").innerHTML = `
-    ${playerName?`<div class="sub">参与者：${playerName}</div>`:""}
-    <div class="stat"><div class="k">最终净值</div><div class="v ${busted?'bust':''}">${fmtM(wealth)}</div></div>
-    <div class="stat"><div class="k">总收益率</div><div class="v ${cls(totalRet)}">${fmtP(totalRet)}</div></div>
-    <div class="stat"><div class="k">交易 / 跳过</div><div class="v">${traded.length} / ${history.filter(h=>h.skipped).length}</div></div>
-    <div class="stat"><div class="k">方向命中率</div><div class="v">${hitRate}</div></div>
-    <div class="stat"><div class="k">平均总杠杆</div><div class="v">${avgGross}</div></div>
-    ${busted?'<div class="pnlbig bust">你爆仓出局了 —— 和原版实验中约六分之一的金融研究生一样。</div>':""}
+    ${playerName?`<div class="sub">Player: ${playerName}</div>`:""}
+    <div class="stat"><div class="k">Final equity</div><div class="v ${busted?'bust':''}">${fmtM(wealth)}</div></div>
+    <div class="stat"><div class="k">Total return</div><div class="v ${cls(totalRet)}">${fmtP(totalRet)}</div></div>
+    <div class="stat"><div class="k">Traded / skipped</div><div class="v">${traded.length} / ${history.filter(h=>h.skipped).length}</div></div>
+    <div class="stat"><div class="k">Direction hit rate</div><div class="v">${hitRate}</div></div>
+    <div class="stat"><div class="k">Average total leverage</div><div class="v">${avgGross}</div></div>
+    ${busted?'<div class="pnlbig bust">You were wiped out — just like roughly one in six of the finance graduate students in the original experiment.</div>':""}
     <div class="bench">
-      <b>对照原版实验（2023）：</b><br>
-      · 118名金融专业研究生：平均收益 +3.2%（统计上与零无异），约50%亏损，约1/6爆仓，方向命中率51.5%；<br>
-      · 网站公开版约1500名玩家：中位数亏损约30%，36%爆仓；<br>
-      · 5位资深宏观交易员：平均 +130%，中位数 +60%，方向命中率63%，约1/3的机会选择不下注。
+      <b>Against the original experiment (2023):</b><br>
+      · 118 finance graduate students: average return +3.2% (statistically indistinguishable from zero), about 50% lost money, about 1/6 were wiped out, direction hit rate 51.5%;<br>
+      · public web version, about 1,500 players: median loss of roughly 30%, 36% wiped out;<br>
+      · 5 veteran macro traders: average +130%, median +60%, direction hit rate 63%, and they sat out about one opportunity in three.
     </div>`;
 
   const rows = history.map((h,i)=>{
-    const posTxt = h.skipped ? "跳过" :
-      ASSETS.map(a=>h.pos[a.key]!==0?`${a.name}${h.pos[a.key]>0?"+":""}${h.pos[a.key].toFixed(1)}×`:null)
-            .filter(Boolean).join("，")||"全空仓";
+    const posTxt = h.skipped ? "Skipped" :
+      ASSETS.map(a=>h.pos[a.key]!==0?`${a.name} ${h.pos[a.key]>0?"+":""}${h.pos[a.key].toFixed(1)}×`:null)
+            .filter(Boolean).join(", ")||"all flat";
     const rr = h.after/h.before-1;
     return `<tr><td>${i+1}</td><td>${h.ev.date}</td><td style="text-align:left">${h.ev.tag}</td>
       <td>${posTxt}</td><td class="${cls(rr)}">${fmtP(rr)}</td><td>${fmtM(h.after)}</td></tr>`;
   }).join("");
   document.getElementById("endTable").innerHTML =
-    `<tr><th>轮</th><th>日期</th><th>事件</th><th>仓位</th><th>本轮收益</th><th>净值</th></tr>${rows}`;
+    `<tr><th>Round</th><th>Date</th><th>Event</th><th>Position</th><th>Round P&amp;L</th><th>Equity</th></tr>${rows}`;
 }
 
 function isInAppOrMobile(){
@@ -525,26 +526,26 @@ function isInAppOrMobile(){
 function buildResultText(){
   const traded = history.filter(h=>!h.skipped);
   const lines = [
-    "【宏观对冲策略交易挑战】成绩单",
-    `参与者：${playerName||"匿名"}　时间：${new Date().toLocaleString("zh-CN")}`,
-    `最终净值：${fmtM(wealth)}（总收益 ${fmtP(wealth/START_WEALTH-1)}）`,
-    `交易 ${traded.length} 轮 / 跳过 ${history.length-traded.length} 轮${busted?"　⚠️中途爆仓出局":""}`,
+    "[Macro Hedge Trading Challenge] Scorecard",
+    `Player: ${playerName||"anonymous"} | Time: ${new Date().toLocaleString("en-US")}`,
+    `Final equity: ${fmtM(wealth)} (total return ${fmtP(wealth/START_WEALTH-1)})`,
+    `Traded ${traded.length} rounds / skipped ${history.length-traded.length}${busted?" ⚠️ wiped out mid-game":""}`,
     "―".repeat(22)
   ];
   history.forEach((h,i)=>{
-    const posTxt = h.skipped ? "跳过" :
-      ASSETS.map(a=>h.pos[a.key]!==0?`${a.name}${h.pos[a.key]>0?"+":""}${h.pos[a.key]}×`:null)
-            .filter(Boolean).join(" ")||"全空仓";
-    lines.push(`${i+1}. ${h.ev.date} ${h.ev.tag}｜${posTxt}｜${fmtP(h.after/h.before-1)} → ${fmtM(h.after)}`);
+    const posTxt = h.skipped ? "Skipped" :
+      ASSETS.map(a=>h.pos[a.key]!==0?`${a.name} ${h.pos[a.key]>0?"+":""}${h.pos[a.key]}×`:null)
+            .filter(Boolean).join(" ")||"all flat";
+    lines.push(`${i+1}. ${h.ev.date} ${h.ev.tag} | ${posTxt} | ${fmtP(h.after/h.before-1)} → ${fmtM(h.after)}`);
   });
   lines.push("―".repeat(22));
-  lines.push("对照：原版实验118名金融研究生平均仅+3.2%，一半亏损，1/6爆仓。");
+  lines.push("Benchmark: in the original experiment the 118 finance graduate students averaged just +3.2%; half lost money and one in six were wiped out.");
   return lines.join("\n");
 }
 
 function exportResults(){
   if(isInAppOrMobile()){
-    // 微信等内置浏览器不支持文件下载：展示可复制的成绩单文本
+    // WeChat and other in-app browsers cannot download files: show a copyable scorecard instead
     const panel = document.getElementById("copyPanel");
     panel.classList.remove("hidden");
     const ta = document.getElementById("copyText");
@@ -553,20 +554,20 @@ function exportResults(){
     panel.scrollIntoView({behavior:"smooth"});
     return;
   }
-  const head = ["轮次","事件日期","事件","是否跳过",
-    ...ASSETS.map(a=>a.name+"仓位"),
-    ...ASSETS.map(a=>a.name+"真实涨跌"),
-    "轮前净值","轮后净值"];
+  const head = ["Round","Event date","Event","Skipped",
+    ...ASSETS.map(a=>a.name+" position"),
+    ...ASSETS.map(a=>a.name+" actual move"),
+    "Equity before","Equity after"];
   const lines = [
-    `参与者,${playerName||"匿名"}`,
-    `导出时间,${new Date().toLocaleString("zh-CN")}`,
-    `最终净值,${wealth.toFixed(0)}`,
-    `总收益率,${((wealth/START_WEALTH-1)*100).toFixed(2)}%`,
+    `Player,${playerName||"anonymous"}`,
+    `Exported,${new Date().toLocaleString("en-US")}`,
+    `Final equity,${wealth.toFixed(0)}`,
+    `Total return,${((wealth/START_WEALTH-1)*100).toFixed(2)}%`,
     "",
     head.join(",")
   ];
   history.forEach((h,i)=>{
-    lines.push([i+1, h.ev.date, h.ev.tag, h.skipped?"是":"否",
+    lines.push([i+1, h.ev.date, h.ev.tag, h.skipped?"yes":"no",
       ...ASSETS.map(a=>h.pos[a.key]),
       ...ASSETS.map(a=>(h.ev.ret[a.key]*100).toFixed(2)+"%"),
       h.before.toFixed(0), h.after.toFixed(0)].join(","));
@@ -574,7 +575,7 @@ function exportResults(){
   const blob = new Blob(["﻿"+lines.join("\r\n")], {type:"text/csv;charset=utf-8"});
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = `宏观策略交易成绩_${playerName||"匿名"}_${Date.now()}.csv`;
+  a.download = `macro-hedge-challenge_${playerName||"anonymous"}_${Date.now()}.csv`;
   a.click();
   URL.revokeObjectURL(a.href);
 }
